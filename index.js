@@ -3,7 +3,12 @@ const cors = require('cors')
 const app = express()
 
 app.use(express.json());
+<<<<<<< HEAD
 app.use(cors())
+=======
+app.use(cors());
+app.use(express.static('dist'));
+>>>>>>> 72662d4 (feat: active dist)
 
 let notes = [
   {
@@ -81,6 +86,18 @@ app.delete('/api/notes/:id', (request, response) => {
     const id = Number(request.params.id);
     notes = notes.filter(note => note.id !== id);
     response.status(204).end();
+})
+
+app.put('/api/notes/:id', (request, response) => {
+    const id = Number(request.params.id);
+    const body = request.body;
+    const note = notes.find(note => note.id === id);
+    if(note){
+      note.important = body.important;
+      response.json(note);
+    }else{
+      response.status(404).json({ error: 'Note not found' });
+    }
 })
 
 const unknownEndpoint = (request, response) => {
