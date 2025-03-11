@@ -3,12 +3,8 @@ const cors = require('cors')
 const app = express()
 
 app.use(express.json());
-<<<<<<< HEAD
-app.use(cors())
-=======
 app.use(cors());
 app.use(express.static('dist'));
->>>>>>> 72662d4 (feat: active dist)
 
 let notes = [
   {
