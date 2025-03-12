@@ -1,6 +1,8 @@
+require('dotenv').config()
 const express = require('express');
-const cors = require('cors')
-const app = express()
+const cors = require('cors');
+const Note = require('./models/note');
+const app = express();
 
 app.use(express.json());
 app.use(cors());
@@ -39,7 +41,11 @@ app.get('/', (request, response) => {
 });
 
 app.get('/api/notes', (request, response) => {
-    response.json(notes)
+  Note
+    .find({})
+    .then(notes => {
+      response.json(notes)
+    })
 })
 
 const generateId = () => {
@@ -51,31 +57,23 @@ const generateId = () => {
 
 app.post('/api/notes', (request, response) => {
     const body = request.body;
-    if (!body.content) {
-        return response.status(400).json({ 
-          error: 'content missing' 
-        })
+    if (body.content === undefined) {
+      return response.status(400).json({ error: 'content missing' })
     }
-    const note = {
+    const note = new Note({
         content: body.content,
-        important: Boolean(body.important) || false,
-        id: generateId(),
-    }
-    notes = notes.concat(note);
-    response.json(note)
+        important: body.important || false,
+    })
+    note.save().then(savedNote => {
+      response.json(savedNote)
+    })
 })
 
 app.get('/api/notes/:id', (request, response) => {
-    const id = Number(request.params.id);
-    const note = notes.find(note => {
-      return note.id === id
-    })
-    if (note) {
-        response.json(note)
-    }else{
-        response.status(404).end();
-    }
-    
+    const id = request.params.id;
+    Note.findById(id).then(note => {
+      response.json(note)
+    })    
 })
 
 app.delete('/api/notes/:id', (request, response) => {
